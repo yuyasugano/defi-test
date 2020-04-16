@@ -21,7 +21,7 @@ from boto3.dynamodb.conditions import Key, Attr
 import pandas as pd
 
 TABLE_NAME = 'Tokens'
-TOKEN_LIST = ["Maker", "Synthetix", "Uniswap", "Kyber", "dYdX"]
+TOKEN_LIST = ["Maker", "Compound", "Synthetix", "Uniswap", "Kyber", "dYdX"]
 
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
@@ -64,7 +64,9 @@ def main():
                 print("DataFrame has been initialized successfully with", token)
             else:
                 ret = pd.Series(tvl, index=datetime, name=token)
-                df = pd.concat([df, ret], axis=1)
+                # FutureWarning: Sorting because non-concatenation axis is not aligned.
+                # A future version of pandas will change to not sort by default.
+                df = pd.concat([df, ret], axis=1, sort=True)
             i = i + 1
         except Exception as e:
             print("Token id: {} extraction failed.".format(token))
