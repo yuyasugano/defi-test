@@ -40,11 +40,27 @@ def get_lastprice(name):
         return record
 
 def lambda_handler(event, context):
-    message = get_lastprice(event['name'])
-    return message
-    '''
-    return {
-        'statusCode': 200,
-        'body': json.dumps(message, cls=DecimalEncoder)
-    }
-    '''
+    if event['queryStringParameters'] is None:
+        return {
+            'isBase64Encoded': False,
+            'statusCode': 500,
+            'headers': {},
+            'body': json.dumps('Internal server error')
+        }
+    try:
+        message = get_lastprice(event['queryStringParameters']['name'])
+    except Exception as e:
+        print(e.arps)
+        return {
+            'isBase64Encoded': False,
+            'statusCode': 400,
+            'headers': {},
+            'body': json.dumps('Bad request')
+        }
+    else:
+        return {
+            'isBase64Encoded': False,
+            'statusCode': 200,
+            'headers': {},
+            'body': json.dumps(message, cls=DecimalEncoder)
+        }
